@@ -64,16 +64,21 @@ class Database:
                 print("Id = ", row[0], "Name = ", row[1])
                 name = row[1]
                 photo = row[2]
-                resume_file = row[3]
 
-                print("Сохранение изображения сотрудника и резюме на диске \n")
                 photo_path = os.path.join("db_data", name + ".jpg")
-                resume_path = os.path.join("db_data", name + "_resume.txt")
                 self.write_to_file(photo, photo_path)
-                self.write_to_file(resume_file, resume_path)
+
             self.cursor.close()
         except sqlite3.Error as error:
             print("Ошибка при работе с SQLite", error)
 
     def update_next_id(self, prev_id, next_id):
-        self.cursor = self.connection.cursor()
+        try:
+            self.cursor = self.connection.cursor()
+            command_update = '''UPDATE current_game SET next_id = ? WHERE id = ?'''
+            data = (prev_id, next_id)
+            self.cursor.execute(command_update, data)
+            self.connection.commit()
+            self.cursor.close()
+        except:
+            pass
