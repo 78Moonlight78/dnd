@@ -16,7 +16,7 @@ class Database:
                        (id INTEGER PRIMARY KEY AUTOINCREMENT, 
                        name TEXT NOT NULL, 
                        game_id INTEGER, 
-                       count INTEGER NOT NULL,
+                       count INTEGER,
                        FOREIGN KEY (game_id) REFERENCES current_game (id))''')
 
     def convert_to_binary_data(self, filename):
@@ -84,6 +84,20 @@ class Database:
             command_update = '''UPDATE current_game SET next_id = ? WHERE id = ?'''
             data = (prev_id, next_id)
             self.cursor.execute(command_update, data)
+            self.connection.commit()
+            self.cursor.close()
+        except:
+            pass
+
+    def creat_new_game(self, name, game_id, count):
+        try:
+            self.cursor = self.connection.cursor()
+            sql_creat = '''
+                INSERT INTO games
+                (name, game_id, count) VALUES (?, ?, ?)
+            '''
+            data = (name, game_id, count)
+            self.cursor.execute(sql_creat, data)
             self.connection.commit()
             self.cursor.close()
         except:
