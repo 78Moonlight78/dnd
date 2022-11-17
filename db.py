@@ -5,7 +5,7 @@ class Database:
     def __init__(self):
         self.connection = sqlite3.connect("dnd_games_script.db")
         self.cursor = self.connection.cursor()
-
+        self.prev_id = 0
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS current_game 
                         (id INTEGER PRIMARY KEY AUTOINCREMENT,
                          name TEXT NOT NULL, 
@@ -37,6 +37,12 @@ class Database:
             self.cursor.execute(sqlite_insert_blob_query, data_tuple)
             self.connection.commit()
             print("Изображение и файл успешно вставлены как BLOB в таблиу")
+            sql_get_id = '''SELECT id FROM current_game WHERE name = ? AND ImageData = ?'''
+            self.cursor.execute(sql_get_id, (name, emp_photo))
+            records_id = cursor.fetchone()
+            if self.prev_id != 0:
+                self.update_next_id(self.prev_id, records_id)
+            self.prev_id = records_id
             self.cursor.close()
 
         except sqlite3.Error as error:
